@@ -1,4 +1,4 @@
-window.META = {"title": "Von Teheran bis zum Mauerbau: War die deutsch-deutsche Teilung unvermeidbar?", "intro": "Die deutsch-deutsche Teilung entstand schrittweise und war 1945 noch nicht endgültig beschlossen. Ausschlaggebend waren der zunehmende Ost-West-Konflikt und die unterschiedlichen politischen und wirtschaftlichen Entwicklungen in den Besatzungszonen.", "cols": ["Zeitpunkt", "Historisch wichtiger Fakt", "Bedeutung für die Entstehung der Teilung"]};
+window.META = {"title": "Von Teheran bis zum Mauerbau: War die deutsch-deutsche Teilung unvermeidbar?", "intro": "Die deutsch-deutsche Teilung entstand schrittweise und war 1945 noch nicht endgültig beschlossen. Ausschlaggebend waren der zunehmende Ost-West-Konflikt und die unterschiedlichen politischen und wirtschaftlichen Entwicklungen in den Besatzungszonen.", "cols": ["Zeitpunkt", "Historisch wichtiger Fakt", "Bedeutung für die Entstehung der Teilung"], "phasen": [[0, "1943–1945", "Kriegskonferenzen und Besatzung"], [5, "1945–1947", "Getrennte Wege in den Zonen"], [9, "1948–1949", "Doppelte Staatsgründung"], [18, "1950–1958", "Einbindung in die Blöcke"]]};
 window.FAKTEN = [
  {
   "z": "28.11.–02.12.1943: Konferenz von Teheran",
@@ -7,6 +7,7 @@ window.FAKTEN = [
   "d": "28.11.–02.12.1943",
   "n": "Konferenz von Teheran",
   "o": 19431128,
+  "a": "alli",
   "y": [
    1943
   ],
@@ -37,6 +38,7 @@ window.FAKTEN = [
   "d": "04.02.–11.02.1945",
   "n": "Konferenz von Jalta",
   "o": 19450204,
+  "a": "alli",
   "y": [
    1945
   ],
@@ -67,6 +69,7 @@ window.FAKTEN = [
   "d": "8. Mai und 5. Juni 1945",
   "n": "Kapitulation und Berliner Erklärung",
   "o": 19450508,
+  "a": "alli",
   "y": [
    1945
   ],
@@ -98,6 +101,7 @@ window.FAKTEN = [
   "d": "30. Juli 1945",
   "n": "Alliierter Kontrollrat",
   "o": 19450730,
+  "a": "alli",
   "y": [
    1945
   ],
@@ -128,6 +132,7 @@ window.FAKTEN = [
   "d": "17. Juli–2. August 1945",
   "n": "Potsdamer Konferenz",
   "o": 19450717,
+  "a": "alli",
   "y": [
    1945
   ],
@@ -158,6 +163,7 @@ window.FAKTEN = [
   "d": "ab 1945",
   "n": "Unterschiedliche Entwicklungen in Ost und West",
   "o": 19450803,
+  "a": "beide",
   "y": [
    1945
   ],
@@ -186,6 +192,7 @@ window.FAKTEN = [
   "d": "April 1946",
   "n": "Zwangsvereinigung von SPD und KPD zur SED",
   "o": 19460401,
+  "a": "ost",
   "y": [
    1946
   ],
@@ -216,6 +223,7 @@ window.FAKTEN = [
   "d": "1. Januar 1947",
   "n": "Bildung der Bizone",
   "o": 19470101,
+  "a": "west",
   "y": [
    1947
   ],
@@ -246,6 +254,7 @@ window.FAKTEN = [
   "d": "12. März und 5. Juni 1947",
   "n": "Truman-Doktrin und Marshallplan (ERP)",
   "o": 19470312,
+  "a": "beide",
   "y": [
    1947
   ],
@@ -277,6 +286,7 @@ window.FAKTEN = [
   "d": "1948",
   "n": "Londoner Sechsmächtekonferenz",
   "o": 19480101,
+  "a": "west",
   "y": [
    1948
   ],
@@ -305,6 +315,7 @@ window.FAKTEN = [
   "d": "20. Juni 1948",
   "n": "Währungsreform in den WBZs",
   "o": 19480620,
+  "a": "west",
   "y": [
    1948
   ],
@@ -335,6 +346,7 @@ window.FAKTEN = [
   "d": "23. Juni 1948",
   "n": "Währungsreform in der SBZ",
   "o": 19480623,
+  "a": "ost",
   "y": [
    1948
   ],
@@ -365,6 +377,7 @@ window.FAKTEN = [
   "d": "24. Juni 1948–12. Mai 1949",
   "n": "Berliner Blockade und Luftbrücke",
   "o": 19480624,
+  "a": "beide",
   "y": [
    1948
   ],
@@ -395,6 +408,7 @@ window.FAKTEN = [
   "d": "März 1948",
   "n": "Stillstand im Alliierten Kontrollrat",
   "o": 19480301,
+  "a": "ost",
   "y": [
    1948
   ],
@@ -425,6 +439,7 @@ window.FAKTEN = [
   "d": "Juli 1948",
   "n": "Frankfurter Dokumente",
   "o": 19480701,
+  "a": "west",
   "y": [
    1948
   ],
@@ -455,6 +470,7 @@ window.FAKTEN = [
   "d": "September 1948–Mai 1949",
   "n": "Parlamentarischer Rat",
   "o": 19480901,
+  "a": "west",
   "y": [
    1948
   ],
@@ -485,6 +501,7 @@ window.FAKTEN = [
   "d": "23. Mai 1949",
   "n": "Gründung der Bundesrepublik Deutschland",
   "o": 19490523,
+  "a": "west",
   "y": [
    1949
   ],
@@ -515,6 +532,7 @@ window.FAKTEN = [
   "d": "7. Oktober 1949",
   "n": "Gründung der DDR",
   "o": 19491007,
+  "a": "ost",
   "y": [
    1949
   ],
@@ -545,6 +563,7 @@ window.FAKTEN = [
   "d": "1950",
   "n": "Beitritt der DDR zum Rat für gegenseitige Wirtschaftshilfe (RGW)",
   "o": 19500101,
+  "a": "ost",
   "y": [
    1950
   ],
@@ -573,6 +592,7 @@ window.FAKTEN = [
   "d": "1951/1952",
   "n": "Westintegration durch die Montanunion",
   "o": 19510101,
+  "a": "west",
   "y": [
    1951,
    1952
@@ -602,6 +622,7 @@ window.FAKTEN = [
   "d": "Mai 1952",
   "n": "Abriegelung der innerdeutschen Grenze",
   "o": 19520501,
+  "a": "ost",
   "y": [
    1952
   ],
@@ -632,6 +653,7 @@ window.FAKTEN = [
   "d": "17. Juni 1953",
   "n": "Niederschlagung des Volksaufstands in der DDR",
   "o": 19530617,
+  "a": "ost",
   "y": [
    1953
   ],
@@ -662,6 +684,7 @@ window.FAKTEN = [
   "d": "6. Mai 1955",
   "n": "NATO-Beitritt der Bundesrepublik",
   "o": 19550506,
+  "a": "west",
   "y": [
    1955
   ],
@@ -692,6 +715,7 @@ window.FAKTEN = [
   "d": "14. Mai 1955",
   "n": "Gründung des Warschauer Pakts unter Beteiligung der DDR",
   "o": 19550514,
+  "a": "ost",
   "y": [
    1955
   ],
@@ -722,6 +746,7 @@ window.FAKTEN = [
   "d": "1957/1958",
   "n": "Gründung der Europäischen Wirtschaftsgemeinschaft (EWG)",
   "o": 19570101,
+  "a": "west",
   "y": [
    1957,
    1958
