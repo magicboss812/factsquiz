@@ -8,7 +8,7 @@ Reines HTML, CSS und JavaScript. Kein Build-Schritt, keine Abhängigkeiten, läu
 
 | Modus | Zweck |
 |---|---|
-| Liste | Die vollständige Faktenliste im Wortlaut. |
+| Liste | Die vollständige Faktenliste als Zeitstrahl oder als Tabelle. Der Zeitstrahl gliedert die Ereignisse in vier Phasen, markiert farbig, wer handelt (Alliierte gemeinsam, Westen, Osten, Ost und West), lässt sich danach filtern und kann die Bedeutung zum Selbsttest verdecken. Die Tabelle zeigt den Wortlaut der Liste. |
 | Mischen | Ein zufälliger Fakt mit allen drei Spalten. Jeder Fakt erscheint einmal, bevor sich etwas wiederholt. |
 | Verdecken | Wie Mischen, aber ein oder zwei Spalten sind verdeckt und lassen sich einzeln aufdecken. Die verdeckte Fläche hat eine feste Größe, die Textlänge ist nicht erkennbar. "Nochmal später" legt den Fakt wieder in den Stapel. |
 | Ordnen | Kurzfassungen der Fakten den chronologisch sortierten Daten zuordnen. Zwei Karten antippen tauscht sie. Runden mit 5, 8, 12 oder allen Fakten. |
@@ -59,12 +59,15 @@ Alle Inhalte stehen in `data.js`. Jeder Eintrag in `FAKTEN` hat diese Felder:
 |---|---|
 | `z`, `f`, `b` | Zeitpunkt, Fakt und Bedeutung im Wortlaut der Liste |
 | `d`, `n` | Datum und Ereignisname getrennt |
-| `o` | Sortierschlüssel `JJJJMMTT` für die Reihenfolge in Ordnen |
+| `o` | Sortierschlüssel `JJJJMMTT` für die Reihenfolge in Ordnen, das Jahr steht im Zeitstrahl |
+| `a` | Handelnde Seite für Farbe und Filter im Zeitstrahl: `alli`, `west`, `ost` oder `beide` |
 | `s` | Kurzfassung für Ordnen, ohne Datum und Ereignisname |
 | `qf`, `qb`, `qd` | Je drei Quizantworten zu Fakt, Bedeutung und Datum. Die erste ist die richtige. |
 | `y`, `mon` | Akzeptierte Jahre und Monate für die Eingabe in der schweren Stufe. `mon: null` blendet das Monatsfeld aus. |
 
-Die Quizantworten und Kurzfassungen sind eigene Formulierungen und gehören nicht zur Liste aus dem Unterricht.
+`META.phasen` legt die Phasen des Zeitstrahls fest: Index des ersten Eintrags, Zeitraum, Name.
+
+Die Quizantworten, Kurzfassungen, Phasennamen und die Zuordnung der handelnden Seite sind eigene Formulierungen und gehören nicht zur Liste aus dem Unterricht.
 
 ## Gestaltung
 
@@ -74,5 +77,5 @@ Die Schriften Cormorant Garamond und Inter werden von Google Fonts geladen. Ohne
 
 ## Hinweise
 
-- Lernstände werden nicht gespeichert. Ein Neuladen setzt alle Modi zurück.
+- Lernstände werden nicht gespeichert. Ein Neuladen setzt alle Modi zurück. Nur die gewählte Ansicht der Liste bleibt im Browser erhalten.
 - Die Liste führt "März 1948: Stillstand im Alliierten Kontrollrat" hinter der Berliner Blockade. Der Modus Liste behält diese Reihenfolge, Ordnen sortiert chronologisch.

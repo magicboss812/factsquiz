@@ -30,12 +30,77 @@
   function val(k, f) { return '<div class="val">' + esc(f[k]) + '</div>'; }
 
   /* Liste */
+  var SEITE = { alli: 'Alliierte gemeinsam', west: 'Westen', ost: 'Osten', beide: 'Ost und West' };
+  var lst = { view: pref('liste-ansicht', 'zeit'), side: 'alle', cover: false };
+  function pref(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } }
+  function setPref(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* ohne Speicher */ } }
+  function phaseOf(i) {
+    var p = 0;
+    META.phasen.forEach(function (ph, j) { if (i >= ph[0]) p = j; });
+    return p;
+  }
   function liste() {
+    var views = [['zeit', 'Zeitstrahl'], ['tabelle', 'Tabelle']].map(function (v) {
+      return '<button class="chip" data-v="' + v[0] + '" aria-pressed="' + (lst.view === v[0]) + '">' + v[1] + '</button>';
+    }).join('');
+    var bar = '<div class="list-bar"><div class="group"><span class="group-lab">Ansicht</span>' + views + '</div>';
+    if (lst.view === 'zeit') {
+      var sides = ['alle', 'alli', 'west', 'ost', 'beide'].map(function (k) {
+        return '<button class="chip side-chip s-' + k + '" data-s="' + k + '" aria-pressed="' + (lst.side === k) + '">' +
+          (k === 'alle' ? 'Alle' : '<i class="dot" aria-hidden="true"></i>' + SEITE[k]) + '</button>';
+      }).join('');
+      bar += '<div class="group"><span class="group-lab">Handelnde</span>' + sides + '</div>' +
+        '<div class="group"><button class="chip" id="cover" aria-pressed="' + lst.cover + '">Bedeutung verdecken</button></div>';
+    }
+    bar += '</div>';
+    var head = '<h1 class="list-title">' + esc(META.title) + '</h1><p class="list-intro">' + esc(META.intro) + '</p>';
+    view.innerHTML = head + bar + (lst.view === 'zeit' ? timeline() : table());
+    on('.list-bar [data-v]', function (n) { lst.view = n.dataset.v; setPref('liste-ansicht', lst.view); keepScroll(liste); });
+    on('.side-chip', function (n) { lst.side = n.dataset.s; keepScroll(liste); });
+    on('#cover', function () { lst.cover = !lst.cover; keepScroll(liste); });
+    on('.phase-link', function (n) {
+      var t = document.getElementById('phase-' + n.dataset.p);
+      if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    on('.ev-reveal', function (n) { n.parentNode.classList.add('open'); n.parentNode.removeChild(n); });
+  }
+  function keepScroll(fn) { var y = window.scrollY; fn(); window.scrollTo(0, y); }
+  function table() {
     var rows = F.map(function (f) {
       return '<tr><td data-l="' + esc(COLS.z) + '">' + esc(f.z) + '</td><td data-l="' + esc(COLS.f) + '">' + esc(f.f) + '</td><td data-l="' + esc(COLS.b) + '">' + esc(f.b) + '</td></tr>';
     }).join('');
-    view.innerHTML = '<h1 class="list-title">' + esc(META.title) + '</h1><p class="list-intro">' + esc(META.intro) + '</p>' +
-      '<table class="facts"><thead><tr><th>' + esc(COLS.z) + '</th><th>' + esc(COLS.f) + '</th><th>' + esc(COLS.b) + '</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    return '<table class="facts"><thead><tr><th>' + esc(COLS.z) + '</th><th>' + esc(COLS.f) + '</th><th>' + esc(COLS.b) + '</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+  function timeline() {
+    var groups = META.phasen.map(function () { return []; });
+    F.forEach(function (f, i) { if (lst.side === 'alle' || f.a === lst.side) groups[phaseOf(i)].push(i); });
+    var overview = '<nav class="phases" aria-label="Phasen">' + META.phasen.map(function (ph, j) {
+      return '<button class="phase-link" data-p="' + j + '"' + (groups[j].length ? '' : ' disabled') + '>' +
+        '<span class="phase-num">Phase ' + (j + 1) + '</span><span class="phase-span">' + esc(ph[1]) + '</span>' +
+        '<span class="phase-name">' + esc(ph[2]) + '</span><span class="phase-count">' + groups[j].length + ' Ereignisse</span></button>';
+    }).join('') + '</nav>';
+    var lastYear = 0;
+    var body = groups.map(function (ids, j) {
+      if (!ids.length) return '';
+      var ph = META.phasen[j];
+      lastYear = 0;
+      return '<section class="phase" id="phase-' + j + '"><header class="phase-head"><span class="phase-num">Phase ' + (j + 1) + ' · ' + esc(ph[1]) + '</span>' +
+        '<h2 class="phase-title">' + esc(ph[2]) + '</h2></header><ol class="tl">' + ids.map(function (i) {
+          var f = F[i], y = Math.floor(f.o / 10000), showYear = y !== lastYear;
+          lastYear = y;
+          var mean = '<div class="ev-lab">' + esc(COLS.b) + '</div><p>' + esc(f.b) + '</p>';
+          if (lst.cover) mean += '<button class="ev-reveal"><span>Aufdecken</span></button>';
+          return '<li class="ev s-' + f.a + '">' +
+            '<div class="ev-year" aria-hidden="true">' + (showYear ? y : '') + '</div>' +
+            '<div class="ev-rail"><span class="ev-node">' + (i + 1) + '</span></div>' +
+            '<article class="ev-card"><header class="ev-head"><div class="ev-meta"><span class="ev-date">' + esc(f.d) + '</span>' +
+            '<span class="tag"><i class="dot" aria-hidden="true"></i>' + SEITE[f.a] + '</span></div>' +
+            '<h3 class="ev-name">' + esc(f.n) + '</h3></header>' +
+            '<div class="ev-body"><div class="ev-fact"><div class="ev-lab">' + esc(COLS.f) + '</div><p>' + esc(f.f) + '</p></div>' +
+            '<div class="ev-mean' + (lst.cover ? ' covered' : '') + '">' + mean + '</div></div></article></li>';
+        }).join('') + '</ol></section>';
+    }).join('');
+    return overview + body;
   }
 
   /* Mischen */
