@@ -73,6 +73,8 @@ Die Quizantworten, Kurzfassungen, Phasennamen und die Zuordnung der handelnden S
 
 Farben, Schrift, Abstände und Komponenten folgen dem Designsystem "Claude Design Analysis": cremefarbener Grund, Korallrot für die Hauptaktion, Serifenschrift für Überschriften. Das dunkle Farbschema richtet sich nach der Systemeinstellung.
 
+Alle Modi nutzen dieselbe Ereigniskarte wie der Zeitstrahl: Datum, farbige Markierung der handelnden Seite, Ereignisname, Fakt und eine farbig abgesetzte Bedeutung. Mischen und Verdecken zeigen dazu die Phase. Verdecken blendet Phase und Farbe aus, solange der Zeitpunkt verdeckt ist. Ordnen zeigt die Farben erst nach dem Prüfen, damit sie keinen Hinweis geben. Das Quiz zeigt nach jeder Antwort die vollständige Karte und hebt den abgefragten Teil hervor.
+
 Die Schriften Cormorant Garamond und Inter werden von Google Fonts geladen. Ohne Netz greifen Systemschriften.
 
 ## Hinweise

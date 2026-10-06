@@ -6,6 +6,7 @@
   var SHORT = { z: 'Zeitpunkt', f: 'Fakt', b: 'Bedeutung' };
   var MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
   var FILL = 'Lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed diam voluptua at vero eos et accusam et justo duo dolores et ea rebum stet clita kasd gubergren no sea takimata sanctus est lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat sed diam voluptua at vero eos et accusam.';
+  var SEITE = { alli: 'Alliierte gemeinsam', west: 'Westen', ost: 'Osten', beide: 'Ost und West' };
   var onKey = null;
 
   function esc(s) {
@@ -26,11 +27,24 @@
   }
   function $(sel) { return view.querySelector(sel); }
   function on(sel, fn) { Array.prototype.forEach.call(view.querySelectorAll(sel), function (n) { n.addEventListener('click', function (e) { fn(n, e); }); }); }
-  function cell(k, html) { return '<div class="cell cell-' + k + '"><div class="lab">' + esc(COLS[k]) + '</div>' + html + '</div>'; }
-  function val(k, f) { return '<div class="val">' + esc(f[k]) + '</div>'; }
+  function tag(a) { return '<span class="tag"><i class="dot" aria-hidden="true"></i>' + SEITE[a] + '</span>'; }
+  function phaseLine(i) {
+    var j = phaseOf(i), ph = META.phasen[j];
+    return '<p class="phase-line"><span class="phase-num">Phase ' + (j + 1) + ' · ' + esc(ph[1]) + '</span> ' + esc(ph[2]) + '</p>';
+  }
+  /* Ereigniskarte. o.part(k) liefert für 'z', 'f' oder 'b' eigenes HTML statt des Inhalts. */
+  function evCard(i, o) {
+    o = o || {};
+    var f = F[i], part = o.part || function () { return null; };
+    var z = part('z'), fv = part('f'), bv = part('b');
+    var head = z !== null ? z : '<div class="ev-meta"><span class="ev-date">' + esc(f.d) + '</span>' + tag(f.a) + '</div><h3 class="ev-name">' + esc(f.n) + '</h3>';
+    return '<article class="ev-card ' + (z !== null ? 's-none' : 's-' + f.a) + (o.cls ? ' ' + o.cls : '') + '">' +
+      '<header class="ev-head">' + head + '</header>' +
+      '<div class="ev-body"><div class="ev-fact"><div class="ev-lab">' + esc(COLS.f) + '</div>' + (fv !== null ? fv : '<p>' + esc(f.f) + '</p>') + '</div>' +
+      '<div class="ev-mean' + (o.meanCls ? ' ' + o.meanCls : '') + '"><div class="ev-lab">' + esc(COLS.b) + '</div>' + (bv !== null ? bv : '<p>' + esc(f.b) + '</p>') + '</div></div></article>';
+  }
 
   /* Liste */
-  var SEITE = { alli: 'Alliierte gemeinsam', west: 'Westen', ost: 'Osten', beide: 'Ost und West' };
   var lst = { view: pref('liste-ansicht', 'zeit'), side: 'alle', cover: false };
   function pref(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } }
   function setPref(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* ohne Speicher */ } }
@@ -88,16 +102,13 @@
         '<h2 class="phase-title">' + esc(ph[2]) + '</h2></header><ol class="tl">' + ids.map(function (i) {
           var f = F[i], y = Math.floor(f.o / 10000), showYear = y !== lastYear;
           lastYear = y;
-          var mean = '<div class="ev-lab">' + esc(COLS.b) + '</div><p>' + esc(f.b) + '</p>';
-          if (lst.cover) mean += '<button class="ev-reveal"><span>Aufdecken</span></button>';
           return '<li class="ev s-' + f.a + '">' +
             '<div class="ev-year" aria-hidden="true">' + (showYear ? y : '') + '</div>' +
             '<div class="ev-rail"><span class="ev-node">' + (i + 1) + '</span></div>' +
-            '<article class="ev-card"><header class="ev-head"><div class="ev-meta"><span class="ev-date">' + esc(f.d) + '</span>' +
-            '<span class="tag"><i class="dot" aria-hidden="true"></i>' + SEITE[f.a] + '</span></div>' +
-            '<h3 class="ev-name">' + esc(f.n) + '</h3></header>' +
-            '<div class="ev-body"><div class="ev-fact"><div class="ev-lab">' + esc(COLS.f) + '</div><p>' + esc(f.f) + '</p></div>' +
-            '<div class="ev-mean' + (lst.cover ? ' covered' : '') + '">' + mean + '</div></div></article></li>';
+            evCard(i, lst.cover ? {
+              meanCls: 'covered',
+              part: function (k) { return k === 'b' ? '<p>' + esc(f.b) + '</p><button class="ev-reveal"><span>Aufdecken</span></button>' : null; }
+            } : null) + '</li>';
         }).join('') + '</ol></section>';
     }).join('');
     return overview + body;
@@ -107,10 +118,11 @@
   var mix = { deck: null, pos: 0 };
   function mischen() {
     if (!mix.deck) { mix.deck = newDeck(-1); mix.pos = 0; }
-    var f = F[mix.deck[mix.pos]];
+    var i = mix.deck[mix.pos];
     view.innerHTML = '<div class="bar"><span class="count">' + (mix.pos + 1) + ' / ' + F.length + '</span><span class="grow"></span>' +
       '<button class="btn btn-primary" id="next">Nächster Fakt</button></div>' +
-      '<article class="fact">' + cell('z', val('z', f)) + cell('f', val('f', f)) + cell('b', val('b', f)) + '</article>';
+      '<div class="progress"><i style="width:' + Math.round(100 * (mix.pos + 1) / F.length) + '%"></i></div>' +
+      '<div class="stage">' + phaseLine(i) + evCard(i, { cls: 'big' }) + '</div>';
     function next() {
       var last = mix.deck[mix.pos];
       mix.pos++;
@@ -131,17 +143,18 @@
   }
   function verdecken() {
     if (hide.cur < 0) hideNext();
-    var f = F[hide.cur];
+    var i = hide.cur, f = F[i];
     var chips = ['z', 'f', 'b'].map(function (k) {
       return '<button class="chip" data-k="' + k + '" aria-pressed="' + (hide.cols.indexOf(k) >= 0) + '">' + SHORT[k] + '</button>';
     }).join('');
     function part(k) {
-      if (hide.cols.indexOf(k) < 0 || hide.shown[k]) return cell(k, val(k, f));
-      return cell(k, '<button class="veil veil-' + k + '" data-k="' + k + '" aria-label="' + SHORT[k] + ' aufdecken"><span class="veil-fill" aria-hidden="true">' + FILL + '</span><span class="veil-lab"><span>Aufdecken</span></span></button>');
+      if (hide.cols.indexOf(k) < 0 || hide.shown[k]) return null;
+      return ('<button class="veil veil-' + k + '" data-k="' + k + '" aria-label="' + SHORT[k] + ' aufdecken"><span class="veil-fill" aria-hidden="true">' + FILL + '</span><span class="veil-lab"><span>Aufdecken</span></span></button>');
     }
     view.innerHTML = '<div class="bar"><div class="group"><span class="group-lab">Verdeckt</span>' + chips + '</div><span class="grow"></span>' +
       '<span class="count">Noch ' + (hide.deck.length + 1) + '</span></div>' +
-      '<article class="fact">' + part('z') + part('f') + part('b') + '</article>' +
+      '<div class="stage">' + (part('z') === null ? phaseLine(i) : '<p class="phase-line"><span class="phase-num">Zeitpunkt verdeckt</span></p>') +
+      evCard(i, { cls: 'big', part: part }) + '</div>' +
       '<div class="bar" style="margin-top:24px"><button class="btn btn-secondary" id="again">Nochmal später</button><button class="btn btn-primary" id="knew">Gewusst</button></div>';
     on('.chip', function (n) {
       var k = n.dataset.k, i = hide.cols.indexOf(k);
@@ -181,11 +194,13 @@
       var c = ord.cards[i], ok = c === id, cls = 'card', verdict = '';
       if (ok) right++;
       if (ord.checked) {
-        cls += ok ? ' ok' : ' bad';
-        verdict = '<span class="verdict">' + (ok ? '✓ ' + esc(F[id].n) : '✗ Passt nicht zu diesem Datum') + '</span>';
+        cls += ok ? ' ok s-' + F[id].a : ' bad';
+        verdict = '<span class="verdict">' + (ok ? '✓ ' + esc(F[id].n) + ' ' + tag(F[id].a) : '✗ Passt nicht zu diesem Datum') + '</span>';
       }
       if (ord.sel === i) cls += ' sel';
-      return '<li class="row"><div class="row-date">' + esc(F[id].d) + '</div><button class="' + cls + '" data-i="' + i + '"' + (ord.checked && ok ? ' disabled' : '') + '>' + esc(F[c].s) + verdict + '</button></li>';
+      return '<li class="row' + (ord.checked ? (ok ? ' row-ok s-' + F[id].a : ' row-bad') : '') + '"><div class="row-date">' + esc(F[id].d) + '</div>' +
+        '<div class="ev-rail"><span class="ev-node">' + (i + 1) + '</span></div>' +
+        '<button class="' + cls + '" data-i="' + i + '"' + (ord.checked && ok ? ' disabled' : '') + '>' + esc(F[c].s) + verdict + '</button></li>';
     }).join('');
     var done = ord.checked && right === ord.slots.length;
     view.innerHTML = '<div class="bar"><div class="group"><span class="group-lab">Fakten</span>' + sizes + '</div><span class="grow"></span>' +
@@ -296,7 +311,7 @@
     var done = Math.min(quiz.pos, quiz.total);
     h += '<div class="bar"><span class="count">Frage ' + (quiz.pos + 1) + ' / ' + quiz.items.length + '</span><span class="grow"></span><button class="btn btn-text" id="quit">Beenden</button></div>';
     h += '<div class="progress"><i style="width:' + Math.round(100 * quiz.pos / quiz.items.length) + '%"></i></div>';
-    h += '<div class="q"><div class="badges"><span class="badge">' + TOPIC[t] + '</span>' + (quiz.hard ? '<span class="badge hard">Schwer</span>' : '') + (c.it.retry ? '<span class="badge">Wiederholung</span>' : '') + '</div>';
+    h += '<div class="q"><div class="badges"><span class="badge t-' + t + '">' + TOPIC[t] + '</span>' + (quiz.hard ? '<span class="badge hard">Schwer</span>' : '') + (c.it.retry ? '<span class="badge">Wiederholung</span>' : '') + '</div>';
     var ask;
     if (c.kind === 'event') {
       ask = 'Zu welchem Ereignis gehört diese Bedeutung?';
@@ -336,8 +351,7 @@
     if (c.answered) {
       h += '<div class="fb"><p class="fb-verdict' + (c.ok ? '' : ' no') + '">' + (c.ok ? 'Richtig' : 'Falsch') + '</p>';
       if (c.kind === 'judge' && c.pick !== 0) h += '<div class="lab">Zutreffend wäre</div><p>' + esc((t === 'f' ? f.qf : f.qb)[0]) + '</p>';
-      if (c.kind === 'event') h += '<div class="lab">Ereignis</div><p>' + esc(f.z) + '</p>';
-      h += '<div class="lab">Wortlaut der Liste</div><p>' + esc(t === 'd' ? f.z : f[t]) + '</p></div>';
+      h += '<div class="lab">Eintrag in der Liste</div>' + phaseLine(c.it.i) + evCard(c.it.i, { cls: 'focus-' + t }) + '</div>';
       h += '<button class="btn btn-primary" id="weiter">' + (quiz.pos + 1 >= quiz.items.length ? 'Auswertung' : 'Weiter') + '</button>';
     }
     h += '</div>';
@@ -367,7 +381,7 @@
     var rows = ['f', 'b', 'd'].filter(function (t) { return s[t][1]; }).map(function (t) {
       return '<dt>' + (t === 'f' ? 'Fakten' : t === 'b' ? 'Bedeutung' : 'Daten') + '</dt><dd>' + s[t][0] + ' / ' + s[t][1] + '</dd>';
     }).join('');
-    var miss = quiz.wrong.map(function (w) { return '<li>' + esc(F[w.i].n) + ' (' + TOPIC[w.t] + ')</li>'; }).join('');
+    var miss = quiz.wrong.map(function (w) { return '<li class="s-' + F[w.i].a + '"><i class="dot" aria-hidden="true"></i>' + esc(F[w.i].n) + ' (' + TOPIC[w.t] + ')</li>'; }).join('');
     view.innerHTML = '<section class="result"><p class="score">' + r + ' von ' + n + '</p><dl>' + rows + '</dl>' +
       (miss ? '<h2>Noch unsicher</h2><ul>' + miss + '</ul>' : '') +
       '<div class="bar">' + (miss ? '<button class="btn btn-primary" id="redo">Fehler wiederholen</button><button class="btn btn-on-dark" id="fresh">Neues Quiz</button>'
